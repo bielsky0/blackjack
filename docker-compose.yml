@@ -1,0 +1,33 @@
+version: '3.7'
+services:
+  frontend:
+    container_name: blackjack-frontend
+    volumes:
+      - ./frontend:/frontend
+      - /frontend/node_modules
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    networks:
+      - blackjack-network
+
+  backend:
+    env_file: .env
+    container_name: blackjack-backend
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    volumes:
+      - "./backend:/backend"
+      - /core/app/node_modules
+    ports:
+      - 4000:4000
+    networks:
+      - blackjack-network
+
+networks:
+  blackjack-network:
+    driver: bridge
