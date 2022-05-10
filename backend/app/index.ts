@@ -3,6 +3,7 @@ import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import express from "express";
+import { LobbyConnection } from "./connections/lobby";
 
 interface ServerToCLientEvents {
     receive_message: (data: string) => void;
@@ -36,6 +37,9 @@ const io = new Server<ClientToServerEvents, ServerToCLientEvents>(server, {
 
 io.on("connection", (socket) => {
     console.log(`User connected ${socket.id}`);
+
+    /* eslint-disable-next-line */
+const lobbyConnection = new LobbyConnection(io, socket);
 });
 
 server.listen(process.env.BACKEND_PORT, () => {

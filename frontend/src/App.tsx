@@ -1,29 +1,62 @@
-import React from "react";
-// import io from "socket.io-client";
-
-import logo from "./logo.svg";
+import React, { ChangeEvent } from "react";
+import io from "socket.io-client";
 
 import "./App.css";
-
-// const socket = io("http://localhost:4000");
+/* eslint-disable-next-line */
+const socket = io("http://localhost:4000");
 
 export function App(): JSX.Element {
+    const [room, setRoom] = React.useState("");
+
+    const onSetRoom = React.useCallback((event: ChangeEvent<HTMLInputElement>) => {
+        setRoom(event.target.value);
+    }, []);
+
+    // Messages States
+    const [message, setMessage] = React.useState("");
+    const [messageReceived, setMessageReceived] = React.useState("");
+
+    const joinRoom = React.useCallback(() => {
+        if (room !== "") {
+            socket.emit("join_lobby", room);
+        }
+    }, [room]);
+
+    const sendMessage = React.useCallback(() => {
+        socket.emit("send_message", { message, room });
+    }, [room, message]);
+
+    const onSendMessage = React.useCallback((event: ChangeEvent<HTMLInputElement>) => {
+        setMessage(event.target.value);
+    }, []);
+
+    React.useEffect(() => {
+        socket.on("receive_message", (data) => {
+            console.log("dsad", data);
+            setMessageReceived(data);
+        });
+        console.log("xD");
+        // return () => {
+        //     socket.off("receive_message", (data) => {
+        //         setMessageReceived(data.message);
+        //     });
+        // };
+    }, []);
+
     return (
         <div className="App">
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-                <p>
-                    Edit <code>src/App.tsx</code> and save to reload.
-                </p>
-                <a
-                    className="App-link"
-                    href="https://reactjs.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Learn React
-                </a>
-            </header>
+            <input
+                placeholder="Room Number..."
+                onChange={onSetRoom}
+            />
+            <button onClick={joinRoom}> Join Room</button>
+            <input
+                placeholder="Message..."
+                onChange={onSendMessage}
+            />
+            <button onClick={sendMessage}> Send Message</button>
+            <h1> Message:</h1>
+            {messageReceived}
         </div>
     );
 }
