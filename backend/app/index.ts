@@ -38,8 +38,8 @@ const io = new Server<ClientToServerEvents, ServerToCLientEvents>(server, {
 io.on("connection", (socket) => {
     console.log(`User connected ${socket.id}`);
 
-    /* eslint-disable-next-line */
-const lobbyConnection = new LobbyConnection(io, socket);
+    const lobbyConnection = new LobbyConnection(io, socket);
+    lobbyConnection.init();
 });
 
 server.listen(process.env.BACKEND_PORT, () => {

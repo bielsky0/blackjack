@@ -35,12 +35,11 @@ export function App(): JSX.Element {
             console.log("dsad", data);
             setMessageReceived(data);
         });
-        console.log("xD");
-        // return () => {
-        //     socket.off("receive_message", (data) => {
-        //         setMessageReceived(data.message);
-        //     });
-        // };
+        return () => {
+            socket.off("receive_message", (data) => {
+                setMessageReceived(data.message);
+            });
+        };
     }, []);
 
     return (
