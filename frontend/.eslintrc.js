@@ -295,13 +295,13 @@ module.exports = {
     "@typescript-eslint/no-empty-interface": "warn",
     "@typescript-eslint/no-explicit-any": ["warn"],
     "@typescript-eslint/no-extra-non-null-assertion": "error",
-    "@typescript-eslint/no-floating-promises": [
-      "warn",
-      {
-        ignoreVoid: false,
-        ignoreIIFE: false,
-      },
-    ],
+    // "@typescript-eslint/no-floating-promises": [
+    //   "warn",
+    //   {
+    //     ignoreVoid: true,
+    //     ignoreIIFE: true,
+    //   },
+    // ],
     "@typescript-eslint/no-for-in-array": "error",
     "@typescript-eslint/no-inferrable-types": "warn",
     "@typescript-eslint/no-loop-func": "off",
