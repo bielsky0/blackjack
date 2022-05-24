@@ -54,6 +54,22 @@ import Diamond_Queen from "../../assets/cards/QueenDiamond.png";
 import Diamond_King from "../../assets/cards/KingDiamond.png";
 import Diamond_Ace from "../../assets/cards/AceDiamond.png";
 
+export const Points = {
+    2: 2,
+    3: 3,
+    4: 4,
+    5: 5,
+    6: 6,
+    7: 7,
+    8: 8,
+    9: 9,
+    10: 10,
+    Jack: 10,
+    Queen: 10,
+    King: 10,
+    Ace: 10,
+};
+
 export const TextureId = {
     Heart2: Heart_2,
     Heart3: Heart_3,
