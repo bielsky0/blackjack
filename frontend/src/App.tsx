@@ -8,7 +8,7 @@ import { GameSwitch } from "./components/gameSwitch";
 
 export const App = observer(() => {
     return (
-        <div style={{ position: "absolute", bottom: "10%", left: "10%" }}>
+        <div style={{ position: "absolute", width: "100%", height: "100%", display: "flex" }}>
             <GameSwitch />
         </div>
     );

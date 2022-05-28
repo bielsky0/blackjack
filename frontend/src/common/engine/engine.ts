@@ -47,7 +47,7 @@ export abstract class EngineBase {
     }
 
     protected createCamera(scene: Scene): void {
-        const camera = new ArcRotateCamera("camera", -Math.PI / 2, 0.49, 12, Vector3.Zero(), scene);
+        const camera = new ArcRotateCamera("camera", -Math.PI / 2, 0.49, 14, new Vector3(0.4, 0, 0), scene);
         camera.attachControl();
     }
 
@@ -60,6 +60,8 @@ export abstract class EngineBase {
 
     protected boot(): Promise<void> {
         const assetsManager = new AssetsManager(this.scene);
+
+        assetsManager.addTextureTask("table", TextureId.table);
 
         assetsManager.addTextureTask("2Heart", TextureId.Heart2);
         assetsManager.addTextureTask("3Heart", TextureId.Heart3);

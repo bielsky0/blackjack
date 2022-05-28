@@ -1,0 +1,46 @@
+.dealer_won-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    background-color: black;
+    background: rgba(0, 0, 0, 0.6);
+    animation-duration: 1s;
+    animation-name: load;
+}
+
+.title-wrapper {
+    margin: -20rem 0 0 0;
+    animation-duration: 1s;
+    animation-name: slidein-dealer_won;
+}
+.dealer_won-wrapper__title{
+    font-size: 10rem;
+    color: rgb(255, 255, 255);
+
+}
+
+@keyframes slidein-dealer_won {
+    from {
+        margin: -200rem 0 0 0;
+    }
+  
+    to {
+        margin: -20rem 0 0 0;
+    }
+  }
+
+@keyframes load {
+    from {
+        background: rgba(0, 0, 0, 0);
+    }
+  
+    to {
+        background: rgba(0, 0, 0, 0.6);
+    }
+  }

@@ -53,6 +53,7 @@ import Diamond_Jack from "../../assets/cards/JackDiamond.png";
 import Diamond_Queen from "../../assets/cards/QueenDiamond.png";
 import Diamond_King from "../../assets/cards/KingDiamond.png";
 import Diamond_Ace from "../../assets/cards/AceDiamond.png";
+import Table from "../../assets/table.jpg";
 
 export const Points = {
     2: 2,
@@ -71,6 +72,7 @@ export const Points = {
 };
 
 export const TextureId = {
+    table: Table,
     Heart2: Heart_2,
     Heart3: Heart_3,
     Heart4: Heart_4,

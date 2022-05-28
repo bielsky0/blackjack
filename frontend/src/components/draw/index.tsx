@@ -1,18 +1,20 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import { gameStore } from "../../store/gameStore";
 
 export const Draw = () => {
     const onNewGame = React.useCallback(async () => {
         await gameStore.returnCardsToDeck();
-        gameStore.shuffleDeck();
+        await gameStore.shuffleDeck();
         gameStore.changeState("betting");
     }, []);
     return (
-        <div>
-            <span>{gameStore.dealer.points} </span>
-            <span>{gameStore.players[0].points}</span>
-            <span>Draw</span>
-            <button onClick={onNewGame}>New Game</button>
-        </div>
+        ReactDOM.createPortal(
+            <div className="draw-wrapper" onClick={onNewGame}>
+                <div className="title-wrapper">
+                    <span className="draw-wrapper__title">Draw!</span>
+                </div>
+            </div>,
+            document.body)
     );
 };

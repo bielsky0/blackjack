@@ -17,6 +17,7 @@ export interface Dealer {
 }
 export type GameState = "playing" | "dealerWon" | "playerWon" | "menu" | "betting" | "lose" | "draw";
 export interface GameStore {
+    isAnimating: boolean;
     gameState: GameState;
     deck: Array<Card>;
     cardsInGame: Array<Card>;
@@ -26,8 +27,9 @@ export interface GameStore {
     showHiddenCard: () => Promise<void>;
     addBet: (money: number) => void;
     addHiddenCard: (player: Dealer) => Promise<void>;
-    shuffleDeck: () => void;
+    shuffleDeck: () => Promise<void>;
     addCardToPlayer: (player: Player | Dealer) => Promise<void>;
     returnCardsToDeck: () => Promise<void>;
     changeState: (newState: GameState) => void;
+    clearBet: () => void;
 }

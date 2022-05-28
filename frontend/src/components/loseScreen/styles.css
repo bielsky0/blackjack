@@ -1,4 +1,4 @@
-.menu-wrapper {
+.lose_screen-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -7,20 +7,22 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 1);
+    /* background-color: black; */
+    background: rgba(0, 0, 0, 0.6);
 }
-.title-wrapper {
+
+.lose_screen-title_wrapper {
     margin: -20rem 0 0 0;
     animation-duration: 1s;
-    animation-name: slidein-menu;
+    animation-name: slidein-lose_screen;
 }
-.menu-wrapper__title{
-    font-size: 8rem;
+.lose_screen-wrapper__title{
+    font-size: 7rem;
     color: rgb(255, 255, 255);
 
 }
 
-@keyframes slidein-menu {
+@keyframes slidein-lose_screen {
     from {
         margin: -200rem 0 0 0;
     }

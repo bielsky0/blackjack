@@ -1,18 +1,23 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import { gameStore } from "../../store/gameStore";
+
+import "./styles.css";
 
 export function PlayerWon(): JSX.Element {
     const onNewGame = React.useCallback(async () => {
+        gameStore.changeState("betting");
         await gameStore.returnCardsToDeck();
         gameStore.shuffleDeck();
-        gameStore.changeState("betting");
     }, []);
     return (
-        <div>
-            <span>{gameStore.dealer.points} </span>
-            <span>{gameStore.players[0].points}</span>
-            <span>You won!</span>
-            <button onClick={onNewGame}>New Game</button>
-        </div>
+        ReactDOM.createPortal(
+            <div className="player_won-wrapper" onClick={onNewGame}>
+                <div className="title-wrapper">
+                    <span className="player_won-wrapper__title">You won!</span>
+                </div>
+            </div>,
+            document.body)
+
     );
 }

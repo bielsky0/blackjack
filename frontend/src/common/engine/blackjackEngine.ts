@@ -1,14 +1,16 @@
-import { Animation, MeshBuilder, Quaternion, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
+import { Animation, MeshBuilder, Quaternion, StandardMaterial, Vector3 } from "@babylonjs/core";
 import { EngineBase } from "./engine";
-
-import tableTexture from "../../assets/table.jpg";
 import { Card } from "./cards/card";
 import { CardType, CardValue, Types, Values } from "./cards/types";
 import { Dealer, Player } from "../../store/type";
+import { TextureId } from "../consts/types";
 
 export class BlackJack extends EngineBase {
     public async addCardToPlayer(player: Player | Dealer, card: Card): Promise<void> {
-        await this.moveCard(card, new Vector3(player.cards.length * 0.5, 0.15 + (player.cards.length / 100), player.position.z), 30, 10);
+        await this.moveCard(card,
+            new Vector3(player.cards.length * 0.5, 0.15 + (player.cards.length / 100), player.position.z),
+            30,
+            10);
         await this.rotateCard(card, Quaternion.RotationAxis(new Vector3(1, 0, 0), Math.PI / 2), 30, 10);
     }
 
@@ -40,44 +42,53 @@ export class BlackJack extends EngineBase {
         return cardsS;
     }
 
-    public async returnAllCardsInGame(cardsInGameE: Card[], cardsS: Card[]): Promise<void> {
-        try {
-            while (cardsInGameE.length > 0) {
-                const s = cardsInGameE.length;
-                const cardInGame = cardsInGameE.pop();
-                if (cardInGame) {
-                    await this.moveCard(cardInGame, new Vector3(-6, 0.15 + ((cardsS.length / 100) - (s / 100)), 3), 30, 10);
-                    await this.rotateCard(cardInGame, Quaternion.RotationAxis(new Vector3(1, 0, 0), -Math.PI / 2), 30, 10);
-                }
+    public returnAllCardsInGame(cardsInGameE: Card[], cardsS: Card[]): Promise<void> {
+        const promiseArray: Promise<void>[] = [];
+
+        while (cardsInGameE.length > 0) {
+            const s = cardsInGameE.length;
+            const cardInGame = cardsInGameE.pop();
+            if (cardInGame) {
+                promiseArray.push(this.moveCard(cardInGame, new Vector3(-6, 0.15 + ((cardsS.length / 100) - (s / 100)), 3), 30, 10));
+                promiseArray.push(this.rotateCard(cardInGame, Quaternion.RotationAxis(new Vector3(1, 0, 0), -Math.PI / 2), 30, 10));
+                // await this.moveCard(cardInGame, new Vector3(-6, 0.15 + ((cardsS.length / 100) - (s / 100)), 3), 30, 10);
+                // await this.rotateCard(cardInGame, Quaternion.RotationAxis(new Vector3(1, 0, 0), -Math.PI / 2), 30, 10);
             }
-        } catch (err) {
-            console.log(err);
         }
+        return new Promise((resolve) => {
+            Promise.all(promiseArray).then(() => {
+                resolve();
+            });
+        });
     }
 
-    public shuffelDeckPreviewAnimation(cardsS: Card[]): void {
+    public shuffelDeckPreviewAnimation(cardsS: Card[]): Promise<void> {
+        const promiseArray: Promise<void>[] = [];
+
         // eslint-disable-next-line
         for (const _ of cardsS) {
             const rand1 = Math.floor(Math.random() * 52);
             const rand2 = Math.floor(Math.random() * 52);
 
             const temp = cardsS[rand1];
-            // await this.moveCard(cardsS[rand1], cardsS[rand2].card.position, 1000, 1);
+            promiseArray.push(this.moveCard(cardsS[rand1], cardsS[rand2].card.position, 1000, 1));
             cardsS[rand1] = cardsS[rand2];
-            // console.log(temp.card.position, cardsS[rand2].card.position);
-            // await this.moveCard(cardsS[rand2], temp.card.position, 1000, 1);
+            promiseArray.push(this.moveCard(cardsS[rand2], temp.card.position, 1000, 1));
             cardsS[rand2] = temp;
         }
-        // cardsS.forEach((card) => {
-        //     console.log(card.card.position);
-        // });
+
+        return new Promise((resolve) => {
+            Promise.all(promiseArray).then(() => {
+                resolve();
+            });
+        });
     }
 
     protected addContent(): void {
         this.boot().then(() => {
             const table = MeshBuilder.CreateBox("table", { height: 13, width: 13 * 3000 / 1920, depth: 0.25 }, this.scene);
             const mat2 = new StandardMaterial("mat-table", this.scene);
-            mat2.diffuseTexture = new Texture(tableTexture, this.scene);
+            mat2.diffuseTexture = this.scene.getTextureByName(TextureId.table);
             table.material = mat2;
             table.rotationQuaternion = Quaternion.RotationAxis(new Vector3(1, 0, 0), Math.PI / 2);
         });
