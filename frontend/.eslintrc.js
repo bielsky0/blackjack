@@ -11,12 +11,12 @@ module.exports = {
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
+    createDefaultProgram: true,
     ecmaFeatures: {
       jsx: true,
     },
     ecmaVersion: 6,
     sourceType: "module",
-    tsconfigRootDir: __dirname,
     project: ["./tsconfig.json"],
   },
   plugins: [
@@ -359,7 +359,7 @@ module.exports = {
     "import/no-default-export": "error",
     "import/no-dynamic-require": "warn",
     "import/no-extraneous-dependencies": "off",
-    "import/no-unassigned-import": ["error", { allow: ["react", "**/*.css"] }],
+    // "import/no-unassigned-import": ["error", { allow: ["react", "**/*.css"] }],
     "import/no-webpack-loader-syntax": "off",
     "import/prefer-default-export": "off",
     "import-newlines/enforce": [

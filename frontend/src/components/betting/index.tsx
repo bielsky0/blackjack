@@ -21,6 +21,7 @@ export const Betting = observer(() => {
 
         await gameStore.addCardToPlayer(gameStore.dealer);
         await gameStore.addHiddenCard(gameStore.dealer);
+        console.log("xd");
     }, []);
 
     const onClear = React.useCallback(() => {
@@ -73,45 +74,53 @@ export const Betting = observer(() => {
             <div className="left-wrapper">
 
                 <div className="chips-wrapper">
-                    <button
-                        disabled={gameStore.players[0].money < 0.1 || gameStore.gameState !== "betting" || gameStore.isAnimating}
-                        onClick={onAddBet}
-                        data-bet={0.1}
-                        style={{ backgroundImage: `url(${darkButton})` }}
-                        className={`button ${gameStore.players[0].money < 1 || gameStore.gameState !== "betting" ? "disabled" : ""} `}
-                    >
-                        <div className="bet">0.1</div>
-                    </button>
+                    <div className="chip-wrapper">
+                        <button
+                            disabled={gameStore.players[0].money < 0.1 || gameStore.gameState !== "betting" || gameStore.isAnimating}
+                            onClick={onAddBet}
+                            data-bet={0.1}
+                        // style={{ backgroundImage: `url(${darkButton})` }}
+                            className={`chip white ${gameStore.players[0].money < 0.1 || gameStore.gameState
+                                !== "betting" ? "disabled" : ""} `}
+                        />
+                        <div className="bet">0.1$</div>
+                    </div>
 
-                    <button
-                        disabled={gameStore.players[0].money < 1 || gameStore.gameState !== "betting" || gameStore.isAnimating}
-                        onClick={onAddBet}
-                        data-bet={1}
-                        style={{ backgroundImage: `url(${darkButton})` }}
-                        className={`button ${gameStore.players[0].money < 10 || gameStore.gameState !== "betting" ? "disabled" : ""} `}
-                    >
-                        <div className="bet">1</div>
-                    </button>
+                    <div className="chip-wrapper">
+                        <button
+                            disabled={gameStore.players[0].money < 1 || gameStore.gameState !== "betting" || gameStore.isAnimating}
+                            onClick={onAddBet}
+                            data-bet={1}
+                        // style={{ backgroundImage: `url(${darkButton})` }}
+                            className={`chip red ${gameStore.players[0].money < 10 || gameStore.gameState
+                                !== "betting" ? "disabled" : ""} `}
+                        />
+                        <div className="bet">1$</div>
+                    </div>
 
-                    <button
-                        disabled={gameStore.players[0].money < 5 || gameStore.gameState !== "betting" || gameStore.isAnimating}
-                        onClick={onAddBet}
-                        data-bet={5}
-                        style={{ backgroundImage: `url(${darkButton})` }}
-                        className={`button ${gameStore.players[0].money < 5 || gameStore.gameState !== "betting" ? "disabled" : ""} `}
-                    >
-                        <div className="bet">5</div>
-                    </button>
+                    <div className="chip-wrapper">
+                        <button
+                            disabled={gameStore.players[0].money < 5 || gameStore.gameState !== "betting" || gameStore.isAnimating}
+                            onClick={onAddBet}
+                            data-bet={5}
+                        // style={{ backgroundImage: `url(${darkButton})` }}
+                            className={`chip blue ${gameStore.players[0].money < 5 || gameStore.gameState
+                                !== "betting" ? "disabled" : ""} `}
+                        />
+                        <div className="bet">5$</div>
+                    </div>
 
-                    <button
-                        disabled={gameStore.players[0].money < 10 || gameStore.gameState !== "betting" || gameStore.isAnimating}
-                        onClick={onAddBet}
-                        data-bet={10}
-                        style={{ backgroundImage: `url(${darkButton})` }}
-                        className={`button ${gameStore.players[0].money < 10 || gameStore.gameState !== "betting" ? "disabled" : ""} `}
-                    >
-                        <div className="bet">10</div>
-                    </button>
+                    <div className="chip-wrapper">
+                        <button
+                            disabled={gameStore.players[0].money < 10 || gameStore.gameState !== "betting" || gameStore.isAnimating}
+                            onClick={onAddBet}
+                            data-bet={10}
+                        // style={{ backgroundImage: `url(${darkButton})` }}
+                            className={`chip black ${gameStore.players[0].money < 10 || gameStore.gameState
+                                !== "betting" ? "disabled" : ""} `}
+                        />
+                        <div className="bet">10$</div>
+                    </div>
                 </div>
 
                 <div className="clear-wrapper">

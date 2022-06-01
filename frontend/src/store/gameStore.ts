@@ -49,6 +49,8 @@ export const gameStore = makeAutoObservable<GameStore>({
         try {
             await game.shuffelDeckPreviewAnimation(this.deck);
             runInAction(() => {
+                console.log("runInAction");
+
                 this.isAnimating = false;
             });
         } catch (err) {
@@ -60,8 +62,10 @@ export const gameStore = makeAutoObservable<GameStore>({
         this.isAnimating = true;
         try {
             const card = this.deck[this.cardIdx];
+            console.log(card.value, card.type);
             await game.addCardToPlayer(player, card);
             runInAction(() => {
+                console.log("runInAction");
                 player.cards.push(card);
                 player.points += Points[card.value];
                 this.cardIdx++;
@@ -90,6 +94,8 @@ export const gameStore = makeAutoObservable<GameStore>({
                 this.isAnimating = true;
                 await game.showHiddenCard(this.dealer.hiddenCard);
                 runInAction(() => {
+                    console.log("runInAction");
+
                     this.dealer.hiddenCard = null;
                     this.isAnimating = false;
                 });

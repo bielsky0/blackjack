@@ -1,12 +1,15 @@
+import { observer } from "mobx-react-lite";
 import React from "react";
 import ReactDOM from "react-dom";
 import { gameStore } from "../../store/gameStore";
 
-export const Draw = () => {
+import "./styles.css";
+
+export const Draw = observer(() => {
     const onNewGame = React.useCallback(async () => {
+        gameStore.changeState("betting");
         await gameStore.returnCardsToDeck();
         await gameStore.shuffleDeck();
-        gameStore.changeState("betting");
     }, []);
     return (
         ReactDOM.createPortal(
@@ -17,4 +20,4 @@ export const Draw = () => {
             </div>,
             document.body)
     );
-};
+});

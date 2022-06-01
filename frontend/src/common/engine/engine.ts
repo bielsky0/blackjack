@@ -47,7 +47,7 @@ export abstract class EngineBase {
     }
 
     protected createCamera(scene: Scene): void {
-        const camera = new ArcRotateCamera("camera", -Math.PI / 2, 0.49, 14, new Vector3(0.4, 0, 0), scene);
+        const camera = new ArcRotateCamera("camera", -Math.PI / 2, 0.75, 17, new Vector3(0.7, 0, 0), scene);
         camera.attachControl();
     }
 
@@ -119,6 +119,13 @@ export abstract class EngineBase {
         assetsManager.addTextureTask("KingDiamond", TextureId.DiamondKing);
         assetsManager.addTextureTask("AceDiamond", TextureId.DiamondAce);
 
+        // const s =
+        // assetsManager
+        //     .addMeshTask("chipModel", "", "/Users/bielsky0/Documents/learning/blackjack/frontend/src/assets/models/chip", "scene.gltf");
+        // s.onSuccess = function (task) {
+        //     console.log(task);
+        //     task.loadedMeshes[0].position = new Vector3(3, 3, 3);
+        // };
         return assetsManager.loadAsync();
     }
 
