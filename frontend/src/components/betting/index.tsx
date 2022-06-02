@@ -16,12 +16,14 @@ export const Betting = observer(() => {
 
     const onDeal = React.useCallback(async () => {
         gameStore.changeState("playing");
-        await gameStore.addCardToPlayer(gameStore.players[0]);
-        await gameStore.addCardToPlayer(gameStore.players[0]);
+        for (const player of gameStore.players) {
+            await gameStore.addCardToPlayer(player);
+            await gameStore.addCardToPlayer(player);
+        }
 
         await gameStore.addCardToPlayer(gameStore.dealer);
         await gameStore.addHiddenCard(gameStore.dealer);
-        console.log("xd");
+        gameStore.nextTurn();
     }, []);
 
     const onClear = React.useCallback(() => {
@@ -29,44 +31,39 @@ export const Betting = observer(() => {
     }, []);
 
     const onAddCardToPlayer = React.useCallback(async () => {
-        await gameStore.addCardToPlayer(gameStore.players[0]);
-
-        if (gameStore.players[0].points > 21) {
-            gameStore.changeState("dealerWon");
-            await gameStore.showHiddenCard();
-        }
+        await gameStore.hit();
     }, []);
 
-    const onStand = React.useCallback(async () => {
-        await gameStore.showHiddenCard();
-        while (
-            gameStore.dealer.points < gameStore.players[0].points &&
-            gameStore.players[0].points <= 21 &&
-            gameStore.dealer.points <= 21
-        ) {
-            await gameStore.addCardToPlayer(gameStore.dealer);
-        }
+    const onStand = React.useCallback(() => {
+        gameStore.stand();
+        // while (
+        //     gameStore.dealer.points < gameStore.players[0].points &&
+        //     gameStore.players[0].points <= 21 &&
+        //     gameStore.dealer.points <= 21
+        // ) {
+        //     await gameStore.addCardToPlayer(gameStore.dealer);
+        // }
 
-        if (gameStore.players[0].points > 21) {
-            gameStore.changeState("dealerWon");
-        } else if (gameStore.dealer.points > 21) {
-            gameStore.changeState("playerWon");
-            gameStore.players[0].money += gameStore.players[0].bet * 2;
-        } else {
-            if (gameStore.players[0].points > gameStore.dealer.points) {
-                gameStore.changeState("playerWon");
-                gameStore.players[0].money += gameStore.players[0].bet * 2;
-            }
+        // if (gameStore.players[0].points > 21) {
+        //     gameStore.changeState("dealerWon");
+        // } else if (gameStore.dealer.points > 21) {
+        //     gameStore.changeState("playerWon");
+        //     gameStore.players[0].money += gameStore.players[0].bet * 2;
+        // } else {
+        //     if (gameStore.players[0].points > gameStore.dealer.points) {
+        //         gameStore.changeState("playerWon");
+        //         gameStore.players[0].money += gameStore.players[0].bet * 2;
+        //     }
 
-            if (gameStore.dealer.points > gameStore.players[0].points) {
-                gameStore.changeState("dealerWon");
-            }
+        //     if (gameStore.dealer.points > gameStore.players[0].points) {
+        //         gameStore.changeState("dealerWon");
+        //     }
 
-            if (gameStore.dealer.points === gameStore.players[0].points) {
-                gameStore.changeState("draw");
-                gameStore.players[0].money += gameStore.players[0].bet;
-            }
-        }
+        //     if (gameStore.dealer.points === gameStore.players[0].points) {
+        //         gameStore.changeState("draw");
+        //         gameStore.players[0].money += gameStore.players[0].bet;
+        //     }
+        // }
     }, []);
 
     return (

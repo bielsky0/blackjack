@@ -7,6 +7,8 @@ import { Points } from "../common/consts/types";
 import { game } from "../common";
 
 export const gameStore = makeAutoObservable<GameStore>({
+    turn: null,
+    turnIdx: null,
     isAnimating: false,
     cardIdx: 0,
     gameState: "menu",
@@ -14,19 +16,73 @@ export const gameStore = makeAutoObservable<GameStore>({
     cardsInGame: [],
     dealer: {
         cards: [],
-        position: new Vector3(0.5, 0.15, 3),
+        position: new Vector3(0, 0.15, 4),
         points: 0,
         hiddenCard: null,
     },
     players: [
         {
+            id: Math.random().toString(),
             cards: [],
-            position: new Vector3(0.5, 0.15, -3),
+            position: new Vector3(0, 0.15, -4),
             points: 0,
             money: 100,
             bet: 0,
+            state: "playing",
+        },
+        {
+            id: Math.random().toString(),
+            cards: [],
+            position: new Vector3(6, 0.15, 0),
+            points: 0,
+            money: 100,
+            bet: 0,
+            state: "playing",
+        },
+        {
+            id: Math.random().toString(),
+            cards: [],
+            position: new Vector3(-6, 0.15, 0),
+            points: 0,
+            money: 100,
+            bet: 0,
+            state: "playing",
+        },
+    ],
+    nextTurn() {
+        if (this.turnIdx === null) {
+            this.turnIdx = 0;
+        }
 
-        }],
+        this.turn = this.players[this.turnIdx].id;
+
+        this.turnIdx++;
+
+        if (this.turnIdx === 3) {
+            this.turnIdx = null;
+        }
+    },
+    async hit() {
+        if (this.turn) {
+            const currentPlayer = this.players.find((player) => player.id === this.turn);
+            if (currentPlayer) {
+                await gameStore.addCardToPlayer(currentPlayer);
+                runInAction(() => {
+                    if (currentPlayer.points > 21) {
+                        // this.players[this.turnIdx].
+                        currentPlayer.state = "lose";
+                        this.nextTurn();
+                    }
+                });
+            }
+        }
+    },
+    stand() {
+        if (this.turn && this.turnIdx !== null) {
+            this.players[this.turnIdx].state = "stand";
+            this.nextTurn();
+        }
+    },
     async addHiddenCard(): Promise<void> {
         this.isAnimating = true;
         try {
@@ -49,8 +105,6 @@ export const gameStore = makeAutoObservable<GameStore>({
         try {
             await game.shuffelDeckPreviewAnimation(this.deck);
             runInAction(() => {
-                console.log("runInAction");
-
                 this.isAnimating = false;
             });
         } catch (err) {
@@ -62,10 +116,8 @@ export const gameStore = makeAutoObservable<GameStore>({
         this.isAnimating = true;
         try {
             const card = this.deck[this.cardIdx];
-            console.log(card.value, card.type);
             await game.addCardToPlayer(player, card);
             runInAction(() => {
-                console.log("runInAction");
                 player.cards.push(card);
                 player.points += Points[card.value];
                 this.cardIdx++;
@@ -94,8 +146,6 @@ export const gameStore = makeAutoObservable<GameStore>({
                 this.isAnimating = true;
                 await game.showHiddenCard(this.dealer.hiddenCard);
                 runInAction(() => {
-                    console.log("runInAction");
-
                     this.dealer.hiddenCard = null;
                     this.isAnimating = false;
                 });

@@ -15,7 +15,6 @@ import { TextureId } from "../consts/types";
 
 export class BlackJack extends EngineBase {
     public addCardToPlayer(player: Player | Dealer, card: Card): Promise<void> {
-        // console.log(card.type, card.value);
         const move = new Animation("move", "position", 25, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CONSTANT);
 
         const moveKeys: IAnimationKey[] = [];
@@ -25,17 +24,24 @@ export class BlackJack extends EngineBase {
             value: card.card.position,
         });
 
+        const moveVector =
+        new Vector3(
+            player.position.z === 0 ? player.position.x : player.position.x + (player.cards.length * 0.5),
+            0.15 + (player.cards.length / 100),
+            player.position.z === 0 ? player.position.x > 0 ?
+                player.position.z + (player.cards.length * 0.5) : player.position.z - (player.cards.length * 0.5) : player.position.z);
+
         moveKeys.push({
             frame: 10,
-            value: new Vector3(player.cards.length * 0.5, 0.15 + (player.cards.length / 100), player.position.z),
+            value: moveVector,
         });
 
         move.setKeys(moveKeys);
 
         const rotate = new Animation("rotate",
-            "rotationQuaternion",
+            "rotation",
             25,
-            Animation.ANIMATIONTYPE_QUATERNION,
+            Animation.ANIMATIONTYPE_VECTOR3,
             Animation.ANIMATIONLOOPMODE_CONSTANT);
 
         const rotateKeys: IAnimationKey[] = [];
@@ -43,12 +49,14 @@ export class BlackJack extends EngineBase {
         rotateKeys.push({
             frame: 0,
             value:
-            card.card.rotationQuaternion,
+            card.card.rotation,
         });
+
+        const rotationYValue = player.position.z === 0 ? player.position.x > 0 ? -Math.PI / 2 : Math.PI / 2 : 0;
 
         rotateKeys.push({
             frame: 10,
-            value: Quaternion.RotationAxis(new Vector3(1, 0, 0), Math.PI / 2),
+            value: new Vector3(Math.PI / 2, rotationYValue, 0),
         });
 
         rotate.setKeys(rotateKeys);
@@ -80,7 +88,7 @@ export class BlackJack extends EngineBase {
 
         moveKeys.push({
             frame: 10,
-            value: new Vector3(player.cards.length * 0.5, 0.15 + (player.cards.length / 100), player.position.z),
+            value: new Vector3(player.position.x + (player.cards.length * 0.5), 0.15 + (player.cards.length / 100), player.position.z),
         });
 
         move.setKeys(moveKeys);
@@ -122,7 +130,7 @@ export class BlackJack extends EngineBase {
     }
 
     public async showHiddenCard(card: Card): Promise<void> {
-        await this.rotateCard(card, Quaternion.RotationAxis(new Vector3(1, 0, 0), Math.PI / 2), 30, 10);
+        await this.rotateCard(card, new Vector3(Math.PI / 2, 0, 0), 30, 10);
     }
 
     public createCards(): Card[] {
@@ -152,7 +160,7 @@ export class BlackJack extends EngineBase {
             const cardInGame = cardsInGameE.pop();
             if (cardInGame) {
                 promiseArray.push(this.moveCard(cardInGame, new Vector3(-6, 0.15 + ((cardsS.length / 100) - (s / 100)), 3), 30, 10));
-                promiseArray.push(this.rotateCard(cardInGame, Quaternion.RotationAxis(new Vector3(1, 0, 0), -Math.PI / 2), 30, 10));
+                promiseArray.push(this.rotateCard(cardInGame, new Vector3(-Math.PI / 2, 0, 0), 30, 10));
             }
         }
         return new Promise((resolve) => {
@@ -203,10 +211,10 @@ export class BlackJack extends EngineBase {
         });
     }
 
-    protected rotateCard(card: Card, quaternion: Quaternion, framePerSeconds: number, totalFrames: number): Promise<void> {
+    protected rotateCard(card: Card, rotation: Vector3, framePerSeconds: number, totalFrames: number): Promise<void> {
         return new Promise((resolve) => {
             // eslint-disable-next-line
-            Animation.CreateAndStartAnimation("rotateCard", card.card, "rotationQuaternion", framePerSeconds, totalFrames, card.card.rotationQuaternion, quaternion, 2, undefined, () => {
+            Animation.CreateAndStartAnimation("rotateCard", card.card, "rotation", framePerSeconds, totalFrames, card.card.rotation, rotation, 2, undefined, () => {
                 resolve();
             });
         });
