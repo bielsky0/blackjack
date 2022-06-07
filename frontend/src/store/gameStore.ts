@@ -49,8 +49,6 @@ export const gameStore = makeAutoObservable<GameStore>({
         try {
             await game.shuffelDeckPreviewAnimation(this.deck);
             runInAction(() => {
-                console.log("runInAction");
-
                 this.isAnimating = false;
             });
         } catch (err) {
@@ -58,14 +56,98 @@ export const gameStore = makeAutoObservable<GameStore>({
         }
     },
 
+    async onDouble() {
+        this.isAnimating = true;
+        try {
+            this.addBet(this.players[0].bet);
+
+            await this.addCardToPlayer(this.players[0]);
+
+            await this.showHiddenCard();
+            while (
+                this.dealer.points < this.players[0].points &&
+                this.players[0].points <= 21 &&
+                this.dealer.points <= 21
+            ) {
+                await this.addCardToPlayer(this.dealer);
+            }
+
+            runInAction(() => {
+                if (this.players[0].points > 21) {
+                    this.changeState("dealerWon");
+                } else if (this.dealer.points > 21) {
+                    this.changeState("playerWon");
+                    this.players[0].money += this.players[0].bet * 2;
+                } else {
+                    if (this.players[0].points > this.dealer.points) {
+                        this.changeState("playerWon");
+                        this.players[0].money += this.players[0].bet * 2;
+                    }
+
+                    if (this.dealer.points > this.players[0].points) {
+                        this.changeState("dealerWon");
+                    }
+
+                    if (this.dealer.points === this.players[0].points) {
+                        this.changeState("draw");
+                        this.players[0].money += this.players[0].bet;
+                    }
+                }
+            });
+        } catch (err) {
+            runInAction(() => {
+                this.isAnimating = false;
+            });
+        }
+    },
+
+    async onStand() {
+        this.isAnimating = true;
+        try {
+            await this.showHiddenCard();
+            while (
+                this.dealer.points < this.players[0].points &&
+                this.players[0].points <= 21 &&
+                this.dealer.points <= 21
+            ) {
+                await this.addCardToPlayer(this.dealer);
+            }
+
+            runInAction(() => {
+                if (this.players[0].points > 21) {
+                    this.changeState("dealerWon");
+                } else if (this.dealer.points > 21) {
+                    this.changeState("playerWon");
+                    this.players[0].money += this.players[0].bet * 2;
+                } else {
+                    if (this.players[0].points > this.dealer.points) {
+                        this.changeState("playerWon");
+                        this.players[0].money += this.players[0].bet * 2;
+                    }
+
+                    if (this.dealer.points > this.players[0].points) {
+                        this.changeState("dealerWon");
+                    }
+
+                    if (this.dealer.points === this.players[0].points) {
+                        this.changeState("draw");
+                        this.players[0].money += this.players[0].bet;
+                    }
+                }
+            });
+        } catch (err) {
+            runInAction(() => {
+                this.isAnimating = false;
+            });
+        }
+    },
+
     async addCardToPlayer(player: Player | Dealer): Promise<void> {
         this.isAnimating = true;
         try {
             const card = this.deck[this.cardIdx];
-            console.log(card.value, card.type);
             await game.addCardToPlayer(player, card);
             runInAction(() => {
-                console.log("runInAction");
                 player.cards.push(card);
                 player.points += Points[card.value];
                 this.cardIdx++;
@@ -94,8 +176,6 @@ export const gameStore = makeAutoObservable<GameStore>({
                 this.isAnimating = true;
                 await game.showHiddenCard(this.dealer.hiddenCard);
                 runInAction(() => {
-                    console.log("runInAction");
-
                     this.dealer.hiddenCard = null;
                     this.isAnimating = false;
                 });

@@ -47,7 +47,7 @@ export abstract class EngineBase {
     }
 
     protected createCamera(scene: Scene): void {
-        const camera = new ArcRotateCamera("camera", -Math.PI / 2, 0.75, 17, new Vector3(0.7, 0, 0), scene);
+        const camera = new ArcRotateCamera("camera", -Math.PI / 2, 0.55, 17, new Vector3(0.7, 0, 0), scene);
         camera.attachControl();
     }
 
@@ -60,6 +60,8 @@ export abstract class EngineBase {
 
     protected boot(): Promise<void> {
         const assetsManager = new AssetsManager(this.scene);
+
+        // await SceneLoader.ImportMeshAsync("chip", "", "chip.babylon", this.scene);
 
         assetsManager.addTextureTask("table", TextureId.table);
 

@@ -24,6 +24,8 @@ export interface GameStore {
     cardIdx: number;
     dealer: Dealer;
     players: Player[];
+    onDouble: () => Promise<void>;
+    onStand: () => Promise<void>;
     showHiddenCard: () => Promise<void>;
     addBet: (money: number) => void;
     addHiddenCard: (player: Dealer) => Promise<void>;
