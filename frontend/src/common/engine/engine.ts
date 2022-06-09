@@ -61,8 +61,6 @@ export abstract class EngineBase {
     protected boot(): Promise<void> {
         const assetsManager = new AssetsManager(this.scene);
 
-        // await SceneLoader.ImportMeshAsync("chip", "", "chip.babylon", this.scene);
-
         assetsManager.addTextureTask("table", TextureId.table);
 
         assetsManager.addTextureTask("2Heart", TextureId.Heart2);
@@ -121,13 +119,6 @@ export abstract class EngineBase {
         assetsManager.addTextureTask("KingDiamond", TextureId.DiamondKing);
         assetsManager.addTextureTask("AceDiamond", TextureId.DiamondAce);
 
-        // const s =
-        // assetsManager
-        //     .addMeshTask("chipModel", "", "/Users/bielsky0/Documents/learning/blackjack/frontend/src/assets/models/chip", "scene.gltf");
-        // s.onSuccess = function (task) {
-        //     console.log(task);
-        //     task.loadedMeshes[0].position = new Vector3(3, 3, 3);
-        // };
         return assetsManager.loadAsync();
     }
 

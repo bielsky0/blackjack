@@ -2,6 +2,8 @@ import { observer } from "mobx-react-lite";
 import React from "react";
 import { gameStore } from "../../store/gameStore";
 
+import { isDealBtnDisabled, isSplitBtnDisabled, isActionBtnDisabled } from "./utils";
+
 import darkButton from "../../assets/buttons/dark-button-texture.png";
 
 import redButton from "../../assets/buttons/red-button-texture.png";
@@ -22,16 +24,31 @@ export const ActionsButton = observer(() => {
     }, []);
 
     const onAddCardToPlayer = React.useCallback(async () => {
-        await gameStore.addCardToPlayer(gameStore.players[0]);
+        if (gameStore.gameState === "splitting") {
+            await gameStore.addCardToCurrentSplittedPosition(gameStore.players[0]);
+        } else {
+            await gameStore.addCardToPlayer(gameStore.players[0]);
 
-        if (gameStore.players[0].points > 21) {
-            gameStore.changeState("dealerWon");
-            await gameStore.showHiddenCard();
+            if (gameStore.players[0].points > 21) {
+                gameStore.changeState("dealerWon");
+                await gameStore.showHiddenCard();
+            }
         }
     }, []);
 
+    const onSplit = React.useCallback(async () => {
+        gameStore.changeState("splitting");
+        await gameStore.split();
+        await gameStore.addCardToSplittedPosition(gameStore.players[0], 0);
+        await gameStore.addCardToSplittedPosition(gameStore.players[0], 1);
+    }, []);
+
     const onStand = React.useCallback(async () => {
-        await gameStore.onStand();
+        if (gameStore.gameState === "splitting") {
+            await gameStore.onSplittingStand();
+        } else {
+            await gameStore.onStand();
+        }
     }, []);
     return (
         <div className="rigth-wrapper">
@@ -49,37 +66,46 @@ export const ActionsButton = observer(() => {
             </div>
             <div>
                 <button
-                    disabled={gameStore.gameState !== "betting" || gameStore.players[0].bet <= 0 || gameStore.isAnimating}
+                    disabled={isDealBtnDisabled(gameStore.gameState, gameStore.isAnimating, gameStore.players[0].bet)}
                     onClick={onDeal}
                     style={{ backgroundImage: `url(${darkButton})` }}
-                    className={`button ${gameStore.players[0].bet <= 0 || gameStore.gameState !== "betting" ? "disabled" : ""} `}
+                    className={`button 
+                        ${isDealBtnDisabled(gameStore.gameState, gameStore.isAnimating, gameStore.players[0].bet) ? "disabled" : ""} `}
                 >
                     <div className="shine">Deal</div>
                 </button>
 
                 <button
-                    disabled={gameStore.gameState !== "playing" || gameStore.isAnimating}
+                    disabled={isActionBtnDisabled(gameStore.gameState, gameStore.isAnimating)}
                     onClick={onAddCardToPlayer}
                     style={{ backgroundImage: `url(${greenButton})` }}
-                    className={`button ${gameStore.gameState !== "playing" ? "disabled" : ""} `}
+                    className={`button ${isActionBtnDisabled(gameStore.gameState, gameStore.isAnimating) ? "disabled" : ""} `}
                 >
                     <div className="shine">Hit</div>
                 </button>
                 <button
-                    disabled={gameStore.gameState !== "playing" || gameStore.isAnimating}
+                    disabled={isActionBtnDisabled(gameStore.gameState, gameStore.isAnimating)}
                     onClick={onDouble}
                     style={{ backgroundImage: `url(${darkButton})` }}
-                    className={`button ${gameStore.gameState !== "playing" ? "disabled" : ""} `}
+                    className={`button ${isActionBtnDisabled(gameStore.gameState, gameStore.isAnimating) ? "disabled" : ""} `}
                 >
                     <div className="shine">Double</div>
                 </button>
                 <button
-                    disabled={gameStore.gameState !== "playing" || gameStore.isAnimating}
+                    disabled={isActionBtnDisabled(gameStore.gameState, gameStore.isAnimating)}
                     onClick={onStand}
                     style={{ backgroundImage: `url(${redButton})` }}
-                    className={`button ${gameStore.gameState !== "playing" ? "disabled" : ""} `}
+                    className={`button ${isActionBtnDisabled(gameStore.gameState, gameStore.isAnimating) ? "disabled" : ""} `}
                 >
                     <div className="shine">Stand</div>
+                </button>
+                <button
+                    disabled={isSplitBtnDisabled(gameStore.players[0].cards)}
+                    onClick={onSplit}
+                    style={{ backgroundImage: `url(${redButton})` }}
+                    className={`button ${isSplitBtnDisabled(gameStore.players[0].cards) ? "disabled" : ""} `}
+                >
+                    <div className="shine">Split</div>
                 </button>
             </div>
         </div>

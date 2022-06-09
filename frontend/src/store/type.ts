@@ -7,15 +7,38 @@ export interface Player {
     points: number;
     money: number;
     bet: number;
+    split: SplittedArray;
+    splitIdx: 0 | 1;
 }
 
+// add and move first card to first array
+// add new car to first array
+// add and move second card to second array
+// add new car to second array
+
+// if stand or lose
+// replace first array with second array
+
+// new Vector3(-2, 0.2, -4)
+// new Vector3(0.5, 0.2, 0)
+
+export interface SplittedObject {
+    cards: Card[];
+    position: Vector3;
+    state: "win" | "lose" | "playing" | "stand" | "finished";
+    points: number;
+
+}
+
+export type SplittedArray = [SplittedObject, SplittedObject];
 export interface Dealer {
     cards: Card[];
     position: Vector3;
     points: number;
     hiddenCard: null | Card;
 }
-export type GameState = "playing" | "dealerWon" | "playerWon" | "menu" | "betting" | "lose" | "draw";
+export type GameState = "playing" | "dealerWon" | "playerWon" | "menu" | "betting"
+| "lose" | "draw" | "splitting" | "playerWonSplit" | "dealerWonSplit" | "drawSplit";
 export interface GameStore {
     isAnimating: boolean;
     gameState: GameState;
@@ -24,6 +47,12 @@ export interface GameStore {
     cardIdx: number;
     dealer: Dealer;
     players: Player[];
+    swapSplittedArray: (flag: 0 | 1) => Promise<void>;
+    checkSplit: () => void;
+    onSplittingStand: () => Promise<void>;
+    addCardToSplittedPosition: (player: Player, splittedIdx: 0 | 1) => Promise<void>;
+    addCardToCurrentSplittedPosition: (player: Player) => Promise<void>;
+    split: () => Promise<void>;
     onDouble: () => Promise<void>;
     onStand: () => Promise<void>;
     showHiddenCard: () => Promise<void>;

@@ -10,10 +10,245 @@ import {
 import { EngineBase } from "./engine";
 import { Card } from "./cards/card";
 import { CardType, CardValue, Types, Values } from "./cards/types";
-import { Dealer, Player } from "../../store/type";
+import { Dealer, Player, SplittedArray } from "../../store/type";
 import { TextureId } from "../consts/types";
 
 export class BlackJack extends EngineBase {
+    public async swapSplittedArray(splittedArray: SplittedArray, flag: 0 | 1): Promise<void> {
+        const promiseArray: Promise<void>[] = [];
+
+        if (flag === 1) {
+            for (const [i, card] of splittedArray[0].cards.entries()) {
+                promiseArray.push(this.moveCard(card, new Vector3((i * 0.5) + 0.5,
+                    0.15 + (i / 100), (
+                        0)), 25, 10));
+            }
+
+            for (const [i, card] of splittedArray[1].cards.entries()) {
+                promiseArray.push(this.moveCard(card, new Vector3((i * 0.5) - 2,
+                    0.15 + (i / 100), (
+                        -4)), 25, 10));
+            }
+        }
+
+        if (flag === 0) {
+            for (const [i, card] of splittedArray[0].cards.entries()) {
+                promiseArray.push(this.moveCard(card, new Vector3((i * 0.5) - 2,
+                    0.15 + (i / 100), (
+                        -4)), 25, 10));
+            }
+
+            for (const [i, card] of splittedArray[1].cards.entries()) {
+                promiseArray.push(this.moveCard(card, new Vector3((i * 0.5) + 0.5,
+                    0.15 + (i / 100), (
+                        0)), 25, 10));
+            }
+        }
+
+        return new Promise((resolve) => {
+            Promise.all(promiseArray).then(() => {
+                resolve();
+            });
+        });
+    }
+
+    public async addCardToSplittedPosition(player: Player, card: Card, splittedPosition: 0 | 1): Promise<void> {
+        const move = new Animation("move", "position", 25, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CONSTANT);
+
+        const moveKeys: IAnimationKey[] = [];
+
+        moveKeys.push({
+            frame: 0,
+            value: card.card.position,
+        });
+
+        let position = new Vector3((player.split[splittedPosition].cards.length * 0.5) + 0.5,
+            0.15 + (player.split[splittedPosition].cards.length / 100),
+            0);
+
+        if (splittedPosition === 1) {
+            position = new Vector3((player.split[splittedPosition].cards.length * 0.5) - 2,
+                0.15 + (player.split[splittedPosition].cards.length / 100),
+                -4);
+        }
+
+        moveKeys.push({
+            frame: 10,
+            value: position,
+        });
+
+        move.setKeys(moveKeys);
+
+        const rotate = new Animation("rotate",
+            "rotationQuaternion",
+            25,
+            Animation.ANIMATIONTYPE_QUATERNION,
+            Animation.ANIMATIONLOOPMODE_CONSTANT);
+
+        const rotateKeys: IAnimationKey[] = [];
+
+        rotateKeys.push({
+            frame: 0,
+            value:
+        card.card.rotationQuaternion,
+        });
+
+        rotateKeys.push({
+            frame: 10,
+            value: Quaternion.RotationAxis(new Vector3(1, 0, 0), Math.PI / 2),
+        });
+
+        rotate.setKeys(rotateKeys);
+
+        const aniGroup = new AnimationGroup("addCardToSplittedPosition", this.scene);
+
+        aniGroup.addTargetedAnimation(rotate, card.card);
+        aniGroup.addTargetedAnimation(move, card.card);
+
+        aniGroup.normalize(0, 10);
+
+        aniGroup.play();
+        return new Promise((resolve) => {
+            aniGroup.onAnimationEndObservable.add(() => {
+                resolve();
+            });
+        });
+    }
+
+    public async addCardToCurrentSplittedPosition(player: Player, card: Card): Promise<void> {
+        const move = new Animation("move", "position", 25, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CONSTANT);
+
+        const moveKeys: IAnimationKey[] = [];
+
+        moveKeys.push({
+            frame: 0,
+            value: card.card.position,
+        });
+
+        const position =
+            new Vector3((player.split[player.splitIdx].cards.length * 0.5) + 0.5,
+                0.15 + (player.split[player.splitIdx].cards.length / 100),
+                0);
+
+        moveKeys.push({
+            frame: 10,
+            value: position,
+        });
+
+        move.setKeys(moveKeys);
+
+        const rotate = new Animation("rotate",
+            "rotationQuaternion",
+            25,
+            Animation.ANIMATIONTYPE_QUATERNION,
+            Animation.ANIMATIONLOOPMODE_CONSTANT);
+
+        const rotateKeys: IAnimationKey[] = [];
+
+        rotateKeys.push({
+            frame: 0,
+            value:
+        card.card.rotationQuaternion,
+        });
+
+        rotateKeys.push({
+            frame: 10,
+            value: Quaternion.RotationAxis(new Vector3(1, 0, 0), Math.PI / 2),
+        });
+
+        rotate.setKeys(rotateKeys);
+
+        const aniGroup = new AnimationGroup("addCardToSplittedPosition", this.scene);
+
+        aniGroup.addTargetedAnimation(rotate, card.card);
+        aniGroup.addTargetedAnimation(move, card.card);
+
+        aniGroup.normalize(0, 10);
+
+        aniGroup.play();
+        return new Promise((resolve) => {
+            aniGroup.onAnimationEndObservable.add(() => {
+                resolve();
+            });
+        });
+    }
+
+    public async split(player: Player): Promise<void> {
+        const move0 = new Animation("move", "position", 25, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CONSTANT);
+
+        const moveKeys0: IAnimationKey[] = [];
+
+        moveKeys0.push({
+            frame: 0,
+            value: player.cards[0].card.position,
+        });
+
+        const position0 = new Vector3(0.5, 0.15, 0);
+
+        moveKeys0.push({
+            frame: 10,
+            value: position0,
+        });
+
+        move0.setKeys(moveKeys0);
+
+        const move1 = new Animation("move", "position", 25, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CONSTANT);
+
+        const moveKeys1: IAnimationKey[] = [];
+
+        moveKeys1.push({
+            frame: 0,
+            value: player.cards[1].card.position,
+        });
+
+        const position1 = new Vector3(-2, 0.15, -4);
+
+        moveKeys1.push({
+            frame: 10,
+            value: position1,
+        });
+
+        move1.setKeys(moveKeys1);
+
+        const rotate = new Animation("rotate",
+            "rotationQuaternion",
+            25,
+            Animation.ANIMATIONTYPE_QUATERNION,
+            Animation.ANIMATIONLOOPMODE_CONSTANT);
+
+        const rotateKeys: IAnimationKey[] = [];
+
+        rotateKeys.push({
+            frame: 0,
+            value: Quaternion.RotationAxis(new Vector3(1, 0, 0), -Math.PI / 2),
+
+        });
+
+        rotateKeys.push({
+            frame: 10,
+            value: Quaternion.RotationAxis(new Vector3(1, 0, 0), Math.PI / 2),
+        });
+
+        rotate.setKeys(rotateKeys);
+
+        const aniGroup = new AnimationGroup("splitCards", this.scene);
+
+        aniGroup.addTargetedAnimation(rotate, player.cards[0].card);
+        aniGroup.addTargetedAnimation(rotate, player.cards[1].card);
+        aniGroup.addTargetedAnimation(move0, player.cards[0].card);
+        aniGroup.addTargetedAnimation(move1, player.cards[1].card);
+
+        aniGroup.normalize(0, 10);
+
+        aniGroup.play();
+
+        return new Promise((resolve) => {
+            aniGroup.onAnimationEndObservable.add(() => {
+                resolve();
+            });
+        });
+    }
+
     public addCardToPlayer(player: Player | Dealer, card: Card): Promise<void> {
         // console.log(card.type, card.value);
         const move = new Animation("move", "position", 25, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CONSTANT);
@@ -30,6 +265,9 @@ export class BlackJack extends EngineBase {
             value: new Vector3(player.cards.length * 0.5, 0.15 + (player.cards.length / 100), player.position.z),
         });
 
+        // new Vector3(-2, 0.2, -4)
+        // new Vector3(0.5, 0.2, 0)
+        // new Vector3(player.cards.length * 0.5, 0.15 + (player.cards.length / 100), player.position.z)
         move.setKeys(moveKeys);
 
         const rotate = new Animation("rotate",

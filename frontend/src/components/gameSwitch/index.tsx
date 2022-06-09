@@ -18,9 +18,15 @@ export const GameSwitch = observer(() => {
             return <PlayerWon />;
         case "dealerWon":
             return <DealerWon />;
+        case "playerWonSplit":
+            return <PlayerWon />;
+        case "dealerWonSplit":
+            return <DealerWon />;
         case "lose":
             return <LoseScreen />;
         case "draw":
+            return <Draw />;
+        case "drawSplit":
             return <Draw />;
         default:
             return <Playing />;

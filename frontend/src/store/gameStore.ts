@@ -6,6 +6,9 @@ import { Points } from "../common/consts/types";
 
 import { game } from "../common";
 
+// new Vector3(-2, 0.2, -4)
+// new Vector3(0.5, 0.2, 0)
+
 export const gameStore = makeAutoObservable<GameStore>({
     isAnimating: false,
     cardIdx: 0,
@@ -25,8 +28,128 @@ export const gameStore = makeAutoObservable<GameStore>({
             points: 0,
             money: 100,
             bet: 0,
-
+            splitIdx: 0,
+            split: [{ cards: [], position: new Vector3(0.5, 0.15, 0), state: "playing", points: 0 },
+                { cards: [], position: new Vector3(-2, 0.15, -4), state: "playing", points: 0 }],
         }],
+    async swapSplittedArray(flag: 0 | 1) {
+        this.isAnimating = true;
+        try {
+            await game.swapSplittedArray(this.players[0].split, flag);
+            runInAction(() => {
+                this.isAnimating = false;
+            });
+        } catch (err) {
+            runInAction(() => {
+                this.isAnimating = false;
+            });
+        }
+    },
+    async addCardToSplittedPosition(player: Player, splittedIdx: 0 | 1) {
+        this.isAnimating = true;
+        try {
+            const card = this.deck[this.cardIdx];
+            await game.addCardToSplittedPosition(player, card, splittedIdx);
+
+            runInAction(() => {
+                player.split[splittedIdx].cards.push(card);
+                player.split[splittedIdx].points += Points[card.value];
+                this.cardIdx++;
+                this.cardsInGame.push(card);
+            });
+        } catch (err) {
+            runInAction(() => {
+                this.isAnimating = false;
+            });
+        }
+    },
+    checkSplit() {
+        if (this.players[0].split[this.players[0].splitIdx].points > 21) {
+            this.changeState("dealerWonSplit");
+            this.players[0].split[this.players[0].splitIdx].state = "finished";
+        } else if (this.dealer.points > 21) {
+            this.changeState("playerWonSplit");
+            this.players[0].split[this.players[0].splitIdx].state = "finished";
+
+            this.players[0].money += this.players[0].bet * 2;
+        } else {
+            if (this.players[0].split[this.players[0].splitIdx].points > this.dealer.points) {
+                this.changeState("playerWonSplit");
+                this.players[0].split[this.players[0].splitIdx].state = "finished";
+                this.players[0].money += this.players[0].bet * 2;
+            }
+            if (this.dealer.points > this.players[0].split[this.players[0].splitIdx].points) {
+                this.changeState("dealerWonSplit");
+                this.players[0].split[this.players[0].splitIdx].state = "finished";
+            }
+
+            if (this.dealer.points === this.players[0].split[this.players[0].splitIdx].points) {
+                this.changeState("drawSplit");
+                this.players[0].split[this.players[0].splitIdx].state = "finished";
+                this.players[0].money += this.players[0].bet;
+            }
+        }
+
+        this.players[0].splitIdx = 0;
+    },
+
+    async addCardToCurrentSplittedPosition(player: Player) {
+        this.isAnimating = true;
+        try {
+            const card = this.deck[this.cardIdx];
+            await game.addCardToCurrentSplittedPosition(player, card);
+
+            player.split[player.splitIdx].cards.push(card);
+            player.split[player.splitIdx].points += Points[card.value];
+            this.cardIdx++;
+            this.cardsInGame.push(card);
+            if (player.split[player.splitIdx].points > 21) {
+                player.split[player.splitIdx].state = "lose";
+                player.splitIdx = 1;
+
+                if (player.split[0].state !== "playing" && player.split[1].state !== "playing") {
+                    // do end splitting
+                    await this.showHiddenCard();
+                    while (
+                        this.dealer.points <= 17
+
+                    ) {
+                        await this.addCardToPlayer(this.dealer);
+                    }
+                    this.checkSplit();
+                } else {
+                    await this.swapSplittedArray(0);
+                }
+            }
+
+            runInAction(() => {
+                this.isAnimating = false;
+            });
+        } catch (err) {
+            runInAction(() => {
+                this.isAnimating = false;
+            });
+        }
+    },
+    async split() {
+        this.isAnimating = true;
+        try {
+            await game.split(this.players[0]);
+
+            runInAction(() => {
+                this.players[0].split[0].cards.push(this.players[0].cards[0]);
+                this.players[0].split[1].cards.push(this.players[0].cards[1]);
+                this.players[0].split[0].points += Points[this.players[0].cards[0].value];
+                this.players[0].split[1].points += Points[this.players[0].cards[1].value];
+
+                this.isAnimating = false;
+            });
+        } catch (err) {
+            runInAction(() => {
+                this.isAnimating = false;
+            });
+        }
+    },
     async addHiddenCard(): Promise<void> {
         this.isAnimating = true;
         try {
@@ -101,6 +224,32 @@ export const gameStore = makeAutoObservable<GameStore>({
         }
     },
 
+    async onSplittingStand() {
+        this.isAnimating = true;
+        try {
+            this.players[0].split[this.players[0].splitIdx].state = "stand";
+            this.players[0].splitIdx = 1;
+            if (this.players[0].split[0].state !== "playing" && this.players[0].split[1].state !== "playing") {
+                // do end splitting
+                await this.showHiddenCard();
+                while (
+                    this.dealer.points <= 17
+                    // this.players[0].points <= 21 &&
+                    // this.dealer.points <= 21
+                ) {
+                    await this.addCardToPlayer(this.dealer);
+                }
+                this.checkSplit();
+            } else {
+                await this.swapSplittedArray(0);
+            }
+        } catch (err) {
+            runInAction(() => {
+                this.isAnimating = false;
+            });
+        }
+    },
+
     async onStand() {
         this.isAnimating = true;
         try {
@@ -154,6 +303,10 @@ export const gameStore = makeAutoObservable<GameStore>({
                 this.cardsInGame.push(card);
                 this.isAnimating = false;
             });
+            if (player.points > 21) {
+                this.changeState("dealerWon");
+                await this.showHiddenCard();
+            }
         } catch (err) {
             runInAction(() => {
                 this.isAnimating = false;
@@ -161,6 +314,8 @@ export const gameStore = makeAutoObservable<GameStore>({
         }
     },
     changeState(newState: GameState) {
+        this.isAnimating = true;
+        this.isAnimating = false;
         this.gameState = newState;
     },
     addBet(money: number) {
@@ -194,6 +349,11 @@ export const gameStore = makeAutoObservable<GameStore>({
                     player.cards = [];
                     player.points = 0;
                     player.bet = 0;
+                    player.split.forEach((split) => {
+                        split.state = "playing";
+                        split.points = 0;
+                        split.cards = [];
+                    });
                 });
                 this.dealer.cards = [];
                 this.dealer.points = 0;
@@ -209,3 +369,11 @@ export const gameStore = makeAutoObservable<GameStore>({
         this.players[0].money = 100;
     },
 }, {});
+
+// function timeout(): Promise<void> {
+//     return new Promise((resolve) => {
+//         setTimeout(() => {
+//             resolve();
+//         }, 2000);
+//     });
+// }
