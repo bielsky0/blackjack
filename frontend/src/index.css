@@ -20,3 +20,44 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.appear {
+  animation-name: appear;
+  animation-duration: 200ms;
+  animation-fill-mode: forwards;
+
+ }
+
+ @keyframes appear{
+  0%{
+    opacity: 0;
+    visibility: hidden;
+  }
+  50%{
+    opacity: 0.5;
+  }
+  100%{
+    opacity: 1;
+  }
+}
+
+ .disappear {
+  animation-name: disappear;
+  animation-duration: 200ms;
+  animation-fill-mode: forwards;
+  visibility: hidden;
+
+ }
+
+ @keyframes disappear{
+  0%{
+    opacity: 1;
+  }
+  50%{
+    opacity: 0.5;
+  }
+  100%{
+    visibility: hidden;
+    opacity: 0;
+  }
+}

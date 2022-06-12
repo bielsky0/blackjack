@@ -1,0 +1,42 @@
+.money-wrapper {
+    display:    flex;
+    flex-direction: column;
+    min-width: 16rem;
+}
+
+.bet-wrapper {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0.1rem;
+    background: rgba(0, 0, 0, .7);
+    border-radius: 0.8rem;
+    box-shadow: 0.4rem 0.5rem 0.9rem rgba(0, 0, 0, 0.5);
+    color: rgba(255,255,255,1);
+    margin: 0 0 1rem 0;
+   }
+
+   .bet-wrapper__title {
+    margin: 0 0 0 1.8rem;
+   }
+   .bet-wrapper__value {
+    margin: 0 1.8rem 0 0;
+
+   }
+   .balance-wrapper__title {
+    margin: 0 0 0 1.8rem;
+
+   }
+   .balance-wrapper__value {
+    margin: 0 1.8rem 0 0;
+   }
+   .balance-wrapper {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0.1rem;
+    background: rgba(0, 0, 0, .7);
+    border-radius: 0.8rem;
+    box-shadow: 0.4rem 0.5rem 0.9rem rgba(0, 0, 0, 0.4);
+    color: rgba(255,255,255,1);
+    margin: 0 0 1rem 0;
+
+   }

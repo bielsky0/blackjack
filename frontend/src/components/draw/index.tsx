@@ -2,26 +2,27 @@ import { observer } from "mobx-react-lite";
 import React from "react";
 import ReactDOM from "react-dom";
 import { gameStore } from "../../store/gameStore";
+import { GameState } from "../../store/type";
 
 import "./styles.css";
 
 export const Draw = observer(() => {
+    console.log(gameStore.players[0].splitIdx);
+
     const onNewGame = React.useCallback(async () => {
-        if (gameStore.gameState === "drawSplit") {
+        if (gameStore.gameState === GameState.PushSplit) {
             if (gameStore.players[0].split[0].state === "finished" && gameStore.players[0].split[1].state === "finished") {
-                gameStore.changeState("betting");
+                gameStore.changeState(GameState.Betting);
                 await gameStore.returnCardsToDeck();
                 await gameStore.shuffleDeck();
             } else {
                 if (gameStore.players[0].splitIdx === 0) {
-                    console.log("2");
-
                     await gameStore.swapSplittedArray(1);
                 }
                 gameStore.checkSplit();
             }
         } else {
-            gameStore.changeState("betting");
+            gameStore.changeState(GameState.Betting);
             await gameStore.returnCardsToDeck();
             gameStore.shuffleDeck();
         }

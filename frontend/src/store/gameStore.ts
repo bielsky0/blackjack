@@ -12,7 +12,7 @@ import { game } from "../common";
 export const gameStore = makeAutoObservable<GameStore>({
     isAnimating: false,
     cardIdx: 0,
-    gameState: "menu",
+    gameState: GameState.Menu,
     deck: game.createCards(),
     cardsInGame: [],
     dealer: {
@@ -56,6 +56,7 @@ export const gameStore = makeAutoObservable<GameStore>({
                 player.split[splittedIdx].points += Points[card.value];
                 this.cardIdx++;
                 this.cardsInGame.push(card);
+                this.isAnimating = false;
             });
         } catch (err) {
             runInAction(() => {
@@ -65,26 +66,26 @@ export const gameStore = makeAutoObservable<GameStore>({
     },
     checkSplit() {
         if (this.players[0].split[this.players[0].splitIdx].points > 21) {
-            this.changeState("dealerWonSplit");
+            this.changeState(GameState.DealerWonSplit);
             this.players[0].split[this.players[0].splitIdx].state = "finished";
         } else if (this.dealer.points > 21) {
-            this.changeState("playerWonSplit");
+            this.changeState(GameState.PlayerWonSplit);
             this.players[0].split[this.players[0].splitIdx].state = "finished";
 
             this.players[0].money += this.players[0].bet * 2;
         } else {
             if (this.players[0].split[this.players[0].splitIdx].points > this.dealer.points) {
-                this.changeState("playerWonSplit");
+                this.changeState(GameState.PlayerWonSplit);
                 this.players[0].split[this.players[0].splitIdx].state = "finished";
                 this.players[0].money += this.players[0].bet * 2;
             }
             if (this.dealer.points > this.players[0].split[this.players[0].splitIdx].points) {
-                this.changeState("dealerWonSplit");
+                this.changeState(GameState.DealerWonSplit);
                 this.players[0].split[this.players[0].splitIdx].state = "finished";
             }
 
             if (this.dealer.points === this.players[0].split[this.players[0].splitIdx].points) {
-                this.changeState("drawSplit");
+                this.changeState(GameState.PushSplit);
                 this.players[0].split[this.players[0].splitIdx].state = "finished";
                 this.players[0].money += this.players[0].bet;
             }
@@ -175,7 +176,9 @@ export const gameStore = makeAutoObservable<GameStore>({
                 this.isAnimating = false;
             });
         } catch (err) {
-            this.isAnimating = false;
+            runInAction(() => {
+                this.isAnimating = false;
+            });
         }
     },
 
@@ -197,25 +200,59 @@ export const gameStore = makeAutoObservable<GameStore>({
 
             runInAction(() => {
                 if (this.players[0].points > 21) {
-                    this.changeState("dealerWon");
+                    this.changeState(GameState.DealerWon);
                 } else if (this.dealer.points > 21) {
-                    this.changeState("playerWon");
+                    this.changeState(GameState.PlayerWon);
                     this.players[0].money += this.players[0].bet * 2;
                 } else {
                     if (this.players[0].points > this.dealer.points) {
-                        this.changeState("playerWon");
+                        this.changeState(GameState.PlayerWon);
                         this.players[0].money += this.players[0].bet * 2;
                     }
 
                     if (this.dealer.points > this.players[0].points) {
-                        this.changeState("dealerWon");
+                        this.changeState(GameState.DealerWon);
                     }
 
                     if (this.dealer.points === this.players[0].points) {
-                        this.changeState("draw");
+                        this.changeState(GameState.Push);
                         this.players[0].money += this.players[0].bet;
                     }
                 }
+                this.isAnimating = false;
+            });
+        } catch (err) {
+            runInAction(() => {
+                this.isAnimating = false;
+            });
+        }
+    },
+
+    async onSplitDouble() {
+        this.isAnimating = true;
+        try {
+            await this.addCardToCurrentSplittedPosition(this.players[0]);
+            this.players[0].split[this.players[0].splitIdx].state = "stand";
+            this.players[0].splitIdx = 1;
+            if (this.players[0].split[0].state !== "playing" && this.players[0].split[1].state !== "playing") {
+                // do end splitting
+                await this.showHiddenCard();
+                while (
+                    this.dealer.points <= 17
+                    // this.players[0].points <= 21 &&
+                    // this.dealer.points <= 21
+                ) {
+                    await this.addCardToPlayer(this.dealer);
+                }
+                this.checkSplit();
+            } else {
+                await this.swapSplittedArray(0);
+            }
+            runInAction(() => {
+                this.isAnimating = false;
+            });
+            runInAction(() => {
+                this.isAnimating = false;
             });
         } catch (err) {
             runInAction(() => {
@@ -243,6 +280,9 @@ export const gameStore = makeAutoObservable<GameStore>({
             } else {
                 await this.swapSplittedArray(0);
             }
+            runInAction(() => {
+                this.isAnimating = false;
+            });
         } catch (err) {
             runInAction(() => {
                 this.isAnimating = false;
@@ -263,26 +303,29 @@ export const gameStore = makeAutoObservable<GameStore>({
             }
 
             runInAction(() => {
+                console.log(this.players[0].bet);
                 if (this.players[0].points > 21) {
-                    this.changeState("dealerWon");
+                    this.changeState(GameState.DealerWon);
                 } else if (this.dealer.points > 21) {
-                    this.changeState("playerWon");
+                    this.changeState(GameState.PlayerWon);
                     this.players[0].money += this.players[0].bet * 2;
                 } else {
                     if (this.players[0].points > this.dealer.points) {
-                        this.changeState("playerWon");
+                        this.changeState(GameState.PlayerWon);
                         this.players[0].money += this.players[0].bet * 2;
                     }
 
                     if (this.dealer.points > this.players[0].points) {
-                        this.changeState("dealerWon");
+                        this.changeState(GameState.DealerWon);
                     }
 
                     if (this.dealer.points === this.players[0].points) {
-                        this.changeState("draw");
+                        this.changeState(GameState.Push);
                         this.players[0].money += this.players[0].bet;
                     }
                 }
+
+                this.isAnimating = false;
             });
         } catch (err) {
             runInAction(() => {
@@ -304,7 +347,7 @@ export const gameStore = makeAutoObservable<GameStore>({
                 this.isAnimating = false;
             });
             if (player.points > 21) {
-                this.changeState("dealerWon");
+                this.changeState(GameState.DealerWon);
                 await this.showHiddenCard();
             }
         } catch (err) {
@@ -314,8 +357,6 @@ export const gameStore = makeAutoObservable<GameStore>({
         }
     },
     changeState(newState: GameState) {
-        this.isAnimating = true;
-        this.isAnimating = false;
         this.gameState = newState;
     },
     addBet(money: number) {
@@ -365,15 +406,7 @@ export const gameStore = makeAutoObservable<GameStore>({
     },
 
     clearBet() {
+        this.players[0].money += this.players[0].bet;
         this.players[0].bet = 0;
-        this.players[0].money = 100;
     },
 }, {});
-
-// function timeout(): Promise<void> {
-//     return new Promise((resolve) => {
-//         setTimeout(() => {
-//             resolve();
-//         }, 2000);
-//     });
-// }

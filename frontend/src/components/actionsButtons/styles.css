@@ -3,42 +3,83 @@
     flex-direction: column;
    }
 
-   .bet-wrapper {
+
+  
+  .secondary-buttons__wrapper {
     display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0.1rem;
-    background: rgba(0, 0, 0, .7);
-    border-radius: 0.8rem;
-    box-shadow: 0.4rem 0.5rem 0.9rem rgba(0, 0, 0, 0.5);
-    color: rgba(255,255,255,1);
-    margin: 0 0 1rem 0;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem;
    }
-
-   .bet-wrapper__title {
-    margin: 0 0 0 1.8rem;
-   }
-   .bet-wrapper__value {
-    margin: 0 1.8rem 0 0;
-
-   }
-   .balance-wrapper__title {
-    margin: 0 0 0 1.8rem;
-
-   }
-   .balance-wrapper__value {
-    margin: 0 1.8rem 0 0;
-   }
-   .balance-wrapper {
+   .primary-buttons__wrapper {
     display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0.1rem;
-    background: rgba(0, 0, 0, .7);
-    border-radius: 0.8rem;
-    box-shadow: 0.4rem 0.5rem 0.9rem rgba(0, 0, 0, 0.4);
-    color: rgba(255,255,255,1);
-    margin: 0 0 1rem 0;
-
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem;
    }
+   .action-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  
+  }
+   .item2 {
+    grid-area: 1 / 1 / span 1 / span 4;
+  }
+
+   .button {
+    position: relative;
+    border: none;
+    margin: 0 0.4rem;
+    display: inline-block;
+    box-shadow: inset 0px 0px 0px 1px rgba(0,0,0,0.2),
+          inset 0px -5px 0px 0px rgba(0,0,0,0.3),
+       inset 0px 2px 0px 0px rgba(255,255,255,0.5);
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+   }
+   .disabled {
+    opacity: 0.5;
+   }
+
+    .button:disabled,
+    .button[disabled]   {
+        cursor: auto;
+    }
+
+       .button .bet {
+    padding: 0.7rem 1.4rem 0.9rem 1.4rem;
+    color: rgba(0,0,0,0.7);
+    font-weight: 800;
+   }
+
+    .button .clear {
+    padding: 0.5rem 7.4rem;
+    color: rgba(255,255,255,1);
+    font-weight: 800;
+    text-align: center;
+    disabled: true;
+   }
+
+   .button div {
+    padding: 0.8rem 1.6rem 0.9rem 1.6rem;
+    color: rgba(255,255,255,0.7);
+    font-weight: 800;
+    font-size: 1rem;
+   }
+
+button {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    text-align: center;
+  }
+
 
    .rigth-wrapper {
 

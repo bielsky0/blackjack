@@ -6,6 +6,7 @@ import {
     Vector3,
     DirectionalLight,
     AssetsManager,
+    Color4,
 } from "@babylonjs/core";
 
 import { TextureId } from "../consts/types";
@@ -43,11 +44,13 @@ export abstract class EngineBase {
     }
 
     protected createScene(engine: Engine): Scene {
-        return new Scene(engine, {});
+        const scene = new Scene(engine, {});
+        scene.clearColor = new Color4(16 / 255, 17 / 255, 21 / 255, 1);
+        return scene;
     }
 
     protected createCamera(scene: Scene): void {
-        const camera = new ArcRotateCamera("camera", -Math.PI / 2, 0.55, 17, new Vector3(0.7, 0, 0), scene);
+        const camera = new ArcRotateCamera("camera", -Math.PI / 2, 0.55, 17, new Vector3(0.9, 0, 0), scene);
         camera.attachControl();
     }
 

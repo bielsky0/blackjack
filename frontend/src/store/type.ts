@@ -37,8 +37,21 @@ export interface Dealer {
     points: number;
     hiddenCard: null | Card;
 }
-export type GameState = "playing" | "dealerWon" | "playerWon" | "menu" | "betting"
-| "lose" | "draw" | "splitting" | "playerWonSplit" | "dealerWonSplit" | "drawSplit";
+
+export enum GameState {
+    Playing,
+    DealerWon,
+    PlayerWon,
+    Menu,
+    Betting,
+    Lose,
+    Push,
+    Splitting,
+    PlayerWonSplit,
+    DealerWonSplit,
+    PushSplit,
+}
+
 export interface GameStore {
     isAnimating: boolean;
     gameState: GameState;
@@ -47,6 +60,7 @@ export interface GameStore {
     cardIdx: number;
     dealer: Dealer;
     players: Player[];
+    onSplitDouble: () => Promise<void>;
     swapSplittedArray: (flag: 0 | 1) => Promise<void>;
     checkSplit: () => void;
     onSplittingStand: () => Promise<void>;

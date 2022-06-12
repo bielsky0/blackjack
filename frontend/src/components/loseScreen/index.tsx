@@ -2,12 +2,13 @@ import { observer } from "mobx-react-lite";
 import React from "react";
 import ReactDOM from "react-dom";
 import { gameStore } from "../../store/gameStore";
+import { GameState } from "../../store/type";
 
 import "./styles.css";
 
 export const LoseScreen = observer(() => {
     const onLose = React.useCallback(async () => {
-        gameStore.changeState("betting");
+        gameStore.changeState(GameState.Betting);
         await gameStore.returnCardsToDeck();
         await gameStore.shuffleDeck();
         gameStore.players[0].money = 100;

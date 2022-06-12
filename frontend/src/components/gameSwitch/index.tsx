@@ -9,24 +9,25 @@ import { DealerWon } from "../dealerWon";
 import { PlayerWon } from "../playerWon";
 import { LoseScreen } from "../loseScreen";
 import { Draw } from "../draw";
+import { GameState } from "../../store/type";
 
 export const GameSwitch = observer(() => {
     switch (gameStore.gameState) {
-        case "menu":
+        case GameState.Menu:
             return <Menu />;
-        case "playerWon":
+        case GameState.PlayerWon:
             return <PlayerWon />;
-        case "dealerWon":
+        case GameState.DealerWon:
             return <DealerWon />;
-        case "playerWonSplit":
+        case GameState.PlayerWonSplit:
             return <PlayerWon />;
-        case "dealerWonSplit":
+        case GameState.DealerWonSplit:
             return <DealerWon />;
-        case "lose":
+        case GameState.Lose:
             return <LoseScreen />;
-        case "draw":
+        case GameState.Push:
             return <Draw />;
-        case "drawSplit":
+        case GameState.PushSplit:
             return <Draw />;
         default:
             return <Playing />;

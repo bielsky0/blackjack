@@ -10,10 +10,10 @@
     animation-duration: 1s;
     animation-name: load;
     /* background-color: black; */
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.4);
 }
 .title-wrapper {
-    margin: -20rem 0 0 0;
+    margin: -15rem 0 0 0;
     animation-duration: 1s;
     animation-name: slidein-draw;
 }
@@ -23,13 +23,28 @@
 
 }
 
+.dealer-points__title {
+    font-size: 5rem;
+    color: rgb(255, 255, 255);
+    margin: 1rem;
+}
+.vs-points__title {
+    font-size: 4rem;
+    color: rgb(255, 255, 255);
+    margin: 1rem;
+}
+.player-points__title {
+    font-size: 5rem;
+    color: rgb(255, 255, 255);
+    margin: 1rem;
+}
 @keyframes slidein-draw {
     from {
         margin: -200rem 0 0 0;
     }
   
     to {
-        margin: -20rem 0 0 0;
+        margin: -15rem 0 0 0;
     }
   }
 
@@ -39,6 +54,6 @@
     }
   
     to {
-        background: rgba(0, 0, 0, 0.6);
+        background: rgba(0, 0, 0, 0.4);
     }
   }
